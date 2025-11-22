@@ -7,6 +7,8 @@
 #include <memory>
 #include <sstream>
 #include <algorithm>
+#include <chrono>
+#include <thread>
 
 // split string by spaces
 std::vector<std::string> split(const std::string& str) {
@@ -16,6 +18,17 @@ std::vector<std::string> split(const std::string& str) {
     while (iss >> word)
         tokens.push_back(word);
     return tokens;
+}
+
+// Prints the text slow for dramatic effect
+void PrintSlow(const std::string& text, int delayMs = 30)
+{
+    for (char c : text)
+    {
+        std::cout << c << std::flush;                 // print one character
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(delayMs));      // wait a bit
+    }
 }
 
 // lowercase a string
@@ -46,11 +59,16 @@ struct Room
         std::string contextDescription;
     };
     std::vector<Item> items;
-
     std::string detailDescription;
-    virtual void Describe()const {std::cout<< "Base room \n";}
 
     virtual ~Room() = default;
+    virtual void Describe()const {std::cout<< "Base room \n";}
+
+    virtual void PrintHint() const
+    {
+        std::cout << "You look around, but no particular ideas come to mind.\n";
+    }
+
 };
 struct SecurityRoom : Room
 {
@@ -63,8 +81,19 @@ struct SecurityRoom : Room
         
     }
      void Describe() const override
-    {std:: cout<< "You enter the security room after using the card, it's a small room with"
-                  " monitors overseeing the museum.";}
+    {PrintSlow("You enter the security room after using the card, it's a small room with"
+               " monitors overseeing the museum.",40);}
+
+
+    void PrintHint() const override
+    {
+        PrintSlow("You are in the security room.\n",40);
+        PrintSlow("- Check the floor, desks, and consoles.\n",40);
+        PrintSlow("- Light might be important somewhere else.\n",40);
+        //std::cout << "You are in the security room.\n";
+        //std::cout << "- Check the floor, desks, and consoles.\n";
+        //std::cout << "- Light might be important somewhere else.\n";
+    }
 };
 struct ToiletRoom : Room
 {
@@ -75,9 +104,17 @@ struct ToiletRoom : Room
 
         detailDescription = "All the stalldoors are open, and the floor tiles are shining brigthly. Noting of interest in here.";
     }
-     void Describe() const override
-    {std:: cout<< "You push open the heavy door to the museum toilets. "
-                 "A wave of damp air and cleaning chemical stench greets you.";}
+    void Describe() const override
+    {PrintSlow("You push open the heavy door to the museum toilets.\n "
+               "A wave of damp air and cleaning chemical stench greets you."),40;}
+
+    void PrintHint() const override
+    {
+        PrintSlow("You are in the toilets.\n",40);
+        PrintSlow("- Maybe there's something forgotten here.\n",40);
+        //std::cout << "You are in the toilets.\n";
+        //std::cout << "- Maybe there's something forgotten here.\n";
+    }
 };
 struct DinoRoom : Room
 {
@@ -89,7 +126,17 @@ struct DinoRoom : Room
                              "you can see another room to the north";
     }
     void Describe() const override
-    {std:: cout<< "You enter the dinosaur exhibit. A massive T-Rex skeleton looms above!";}
+    {PrintSlow("You enter the dinosaur exhibit. A massive T-Rex skeleton looms above!",40);}
+
+    void PrintHint() const override
+    {
+        PrintSlow("You are in the dinosaur exhibit.\n",40);
+        PrintSlow("- Look carefully at the floor and around the skeletons.\n",40);
+        PrintSlow("- Pick up items if you see any.\n",40);
+        //std::cout << "You are in the dinosaur exhibit.\n";
+        //std::cout << "- Look carefully at the floor and around the skeletons.\n";
+        //std::cout << "- Pick up items if you see any.\n";
+    }
 };
 struct SpaceRoom : Room
 {
@@ -102,7 +149,17 @@ struct SpaceRoom : Room
             "To your left, an astronaut suit stands behind glass. You can see there are 2 more rooms connected.";
     }
     void Describe() const override
-    {std:: cout<< "You enter the space exhibit. Planets and stars spin in the dark.";}
+    {PrintSlow("You enter the space exhibit. Planets and stars spin in the dark.",40);}
+
+    void PrintHint() const override
+    {
+        PrintSlow("You are in the space exhibit.\n",40);
+        PrintSlow("- It's dark and creepy in some directions.\n",40);
+        PrintSlow("- A card or something electronic might be needed for the door.\n",40);
+        //std::cout << "You are in the space exhibit.\n";
+        //std::cout << "- It's dark and creepy in some directions.\n";
+        //std::cout << "- A card or something electronic might be needed for the door.\n";
+    }
 };
 struct EntranceRoom : Room
 {
@@ -119,7 +176,15 @@ struct EntranceRoom : Room
         );
     }
     void Describe() const override
-    {std:: cout<< "You stand in the grand entrance hall. \n";}
+    {PrintSlow("You stand in the grand entrance hall. \n",40);}
+    //{std:: cout<< "You stand in the grand entrance hall. \n";}
+    
+    void PrintHint() const override
+    {
+        PrintSlow("You are in the entrance hall.\n ",40);
+        PrintSlow("- Maybe check left and right first.\n",40);
+        PrintSlow("- You might also find something useful to carry items with.\n",40);
+    }
 };
 struct IceageRoom : Room
 {
@@ -131,7 +196,15 @@ struct IceageRoom : Room
     "Behind the mammoth there are neanderthals hiding in bushes getting ready for the hunt that have started";
     }
     void Describe() const override
-    {std:: cout<< "Cold air greets you as you enter the Ice Age exhibit.";}
+    {PrintSlow("Cold air greets you as you enter the Ice Age exhibit.",40);}
+
+    void PrintHint() const override
+    {
+        PrintSlow("You are in the ice age exhibit.\n",40);
+        PrintSlow("- There might be a weapon hidden here.\n",40);
+        //std::cout << "You are in the ice age exhibit.\n";
+        //std::cout << "- There might be a weapon hidden here.\n";
+    }
 };
 struct ClosedRoom : Room
 {
@@ -143,7 +216,17 @@ struct ClosedRoom : Room
 
     }
     void Describe() const override
-    {std:: cout<< "You can see there is a dog looking agressive patrolling forth and back lounging just outside your reach.\n";}
+    {PrintSlow("You can see there is a dog looking agressive patrolling forth and back lounging just outside your reach.\n",40);}
+
+        void PrintHint() const override
+    {
+        PrintSlow("You are in the closed exhibit.\n",40);
+        PrintSlow("- You see a dog. Attacking unprepared might be a bad idea.\n",40);
+        PrintSlow("- Dogs usually like bones…\n",40);
+        //std::cout << "You are in the closed exhibit.\n";
+        //std::cout << "- You see a dog. Attacking unprepared might be a bad idea.\n";
+        //std::cout << "- Dogs usually like bones…\n";
+    }
 };
 
 // dog states
@@ -173,7 +256,7 @@ struct Game
     bool running = true;
     FlashlightState flashlightState = FlashlightState::NotOwned;
     
-        // Check if the player has an item by name (partial match allowed)
+      // Check if the player has an item by name (partial match allowed)
     bool HasItem(const std::string& name)
     {
         for (const auto& item : inventory)
@@ -186,7 +269,14 @@ struct Game
         return false;
     };
 
-        // Remove an item from inventory (first match)
+       // Help, Prints out helpfull information
+    void Help()
+    {
+        // Finds current room and prints help info 
+        rooms[currentRoom]->PrintHint();
+    }
+
+       // Remove an item from inventory (first match)
     void RemoveItem(const std::string& name)
     {
         for (auto it = inventory.begin(); it != inventory.end(); ++it)
@@ -256,45 +346,55 @@ struct Game
         // Only dog combat exists
         if (target.find("dog") == std::string::npos)
         {
-            std::cout << "Attack what?\n";
+            //std::cout << "Attack what?\n";
+            PrintSlow("Attack what?\n",40);
             return;
         }
 
         // Dog not here
         if (currentRoom != 4)
         {
-            std::cout << "There's no dog here.\n";
+            //std::cout << "There's no dog here.\n";
+            PrintSlow("There's no dog here.\n",40);
             return;
         }
 
         // Dog friendly
         if (dogState == DogState::Friendly)
         {
-            std::cout << "You raise your weapon… but the dog looks at you with trusting eyes.\n";
-            std::cout << "You lower the weapon. You can't do it.\n";
+            PrintSlow("You raise your weapon… but the dog looks at you with trusting eyes.\n"
+                      "You lower the weapon. You can't do it.\n",40);
+            //std::cout << "You raise your weapon… but the dog looks at you with trusting eyes.\n";
+            //std::cout << "You lower the weapon. You can't do it.\n";
             return;
         }
 
         // Already dead
         if (dogState == DogState::Dead)
         {
-            std::cout << "There's nothing left to attack.\n";
+            PrintSlow("There's nothing left to attack.\n",40);
+            //std::cout << "There's nothing left to attack.\n";
             return;
         }
 
         // Hostile but check weapon
         if (!HasItem("spear"))
         {
-            std::cout << "You lunge barehanded, but the dog snarls and leaps back.\n";
-            std::cout << "Without a weapon, that’s not a good idea.\n";
+            PrintSlow("You lunge barehanded, but the dog snarls and leaps back.\n"
+                      "Without a weapon, that’s not a good idea.\n",40);
+            //std::cout << "You lunge barehanded, but the dog snarls and leaps back.\n";
+            //std::cout << "Without a weapon, that’s not a good idea.\n";
             return;
         }
 
         // Success (dog dies)
         dogState = DogState::Dead;
-        std::cout << "You thrust the spear — the dog collapses.\n";
-        std::cout << "With a pained yelp, the creature falls still.\n";
-        std::cout << "Something glints on its collar — a key.\n";
+        PrintSlow("You thrust the spear — the dog collapses.\n"
+                  "With a pained yelp, the creature falls still.\n"
+                  "Something glints on its collar — a key.\n",40);
+        //std::cout << "You thrust the spear — the dog collapses.\n";
+        //std::cout << "With a pained yelp, the creature falls still.\n";
+        //std::cout << "Something glints on its collar — a key.\n";
 
         rooms[currentRoom]->items.push_back({"key", "A brass key dropped from the dog."});
     }
@@ -306,7 +406,7 @@ struct Game
 
         if (room.items.empty())
         {
-            std::cout << "There's nothing to pick up here.\n";
+            PrintSlow("There's nothing to pick up here.\n",40);
             return;
         }
 
@@ -336,31 +436,32 @@ struct Game
 
                     if (carriedNonBackpack >= 1)
                     {
-                        std::cout << "Your hands are full. Without a backpack you can only carry one item.\n";
-                        std::cout << "Maybe you should find something to carry items with.\n";
+                        PrintSlow("Your hands are full. Without a backpack you can only carry one item.\n",40);
+                        PrintSlow("Maybe you should find something to carry items with.\n",40);
                         return;
                     }
                 }
 
                 // === Actually pick up the item ===
                 inventory.push_back(it->name);
-                std::cout << "You picked up the " << it->name << "!\n";
+                std::string msg ="You picked up the " + it->name + "!\n";
+                PrintSlow(msg,40);
+                //std::cout << "You picked up the " << it->name << "!\n";
 
                 // --- Flashlight state tracking (keep your existing logic) ---
                 if (roomItem == "flashlight")
                 {
                     flashlightState = FlashlightState::Off;
-                    std::cout << "(You now have a flashlight. Try to use it.)\n";
+                    PrintSlow("You now have a flashlight. Try to use it.\n",40);
                 }
-
-                // You can add similar special-case logic for other items here
 
                 room.items.erase(it);
                 return;
             }
         }
-
-        std::cout << "You don't see a \"" << rawItemName << "\" here.\n";
+        std::string msg = "You don't see a \"" + rawItemName + "\" here.\n";
+        PrintSlow(msg,40);
+       //std::cout << "You don't see a \"" << rawItemName << "\" here.\n";
     }
 
 
@@ -376,7 +477,8 @@ struct Game
             
             for (size_t i = 0; i < room.items.size(); ++i)
             {
-                std::cout << room.items[i].contextDescription;
+                // print each item description with delay
+                PrintSlow(room.items[i].contextDescription, 40);
 
                 if (i < room.items.size() - 1)
                     std::cout << ", ";
@@ -392,11 +494,13 @@ struct Game
 
         if (!room.detailDescription.empty())
         {
-            std::cout << room.detailDescription << "\n";
+            //std::cout << room.detailDescription << "\n";
+            std::string msg = room.detailDescription + "\n";          
+            PrintSlow(msg,40);
         }
         else
         {
-            std::cout << "There's nothing new to see.\n";
+            PrintSlow("There's nothing new to see.\n",40);
         }
     }
 
@@ -428,7 +532,8 @@ struct Game
         // Check if movement direction exists
         if (roomExits.find(direction) == roomExits.end())
         {
-            std::cout << "You can't go " << direction << " from here.\n";
+            std::string msg= "You can't go " + direction + " from here.\n";
+            PrintSlow(msg,40);
             return;
         }
 
@@ -437,8 +542,10 @@ struct Game
         // Specialfall: vägen från Space Exhibit (2) till Security Room (5) 
         if (currentRoom == 2 && nextRoom == 5 && !securityDoorUnlocked)
         {
-            std::cout << "The door is locked. A keypad blinks red.\n";
-            std::cout << "You'll need a \"security card\" to enter.\n";
+            PrintSlow("The door is locked. A keypad blinks red.\n",40);
+            PrintSlow("You'll need a \"security card\" to enter.\n",40);
+            //std::cout << "The door is locked. A keypad blinks red.\n";
+            //std::cout << "You'll need a \"security card\" to enter.\n";
             return;
         }
 
@@ -446,8 +553,9 @@ struct Game
         const int dogRoom = 4;
         if (nextRoom == dogRoom && flashlightState != FlashlightState::On)
         {
-            std::cout << "It's pitch dark inside. You can barely see, but you hear low growling...\n"
-                    << "Maybe if you had a light source...\n";
+            PrintSlow("It's pitch dark inside. You can barely see, but you hear low growling...\n Maybe if you had a light source...\n");
+            //std::cout << "It's pitch dark inside. You can barely see, but you hear low growling...\n"
+            //        << "Maybe if you had a light source...\n";
             return;
         }
 
@@ -458,12 +566,15 @@ struct Game
 
             if (!HasItem(requiredItem))
             {
-                std::cout << "The door is locked. A keypad blinks red.\n"
-                        << "You'll need a \"" << requiredItem << "\" to enter.\n";
+                std::string msg = std::string("The door is locked. A keypad blinks red.\n") + "You'll need a " + requiredItem + " to enter.\n";
+
+                PrintSlow(msg, 40);
+
                 return;
             }
-
-            std::cout << "You swipe the " << requiredItem << ". The lock clicks open.\n";
+            std::string msg = "You swipe the " + requiredItem + ". The lock clicks open.\n";
+            PrintSlow(msg,40);
+            //std::cout << "You swipe the " << requiredItem << ". The lock clicks open.\n";
             lockedRooms.erase(nextRoom);
         }
 
@@ -478,16 +589,22 @@ struct Game
         {
             if (HasItem("key"))
             {
-                std::cout << "\nYou approach the museum's front door and try the key...\n"
-                        << "It fits perfectly. With a soft click, the lock releases.\n"
-                        << "Cold night air rushes in as the heavy doors swing open.\n"
-                        << "Congratulations — you've escaped the museum!\n";
+                PrintSlow("\nYou approach the museum's front door and try the key...\n"
+                          "It fits perfectly. With a soft click, the lock releases.\n"
+                          "Cold night air rushes in as the heavy doors swing open.\n"
+                          "Congratulations — you've escaped the museum!\n",40);
+
+                //std::cout << "\nYou approach the museum's front door and try the key...\n"
+                //        << "It fits perfectly. With a soft click, the lock releases.\n"
+                //        << "Cold night air rushes in as the heavy doors swing open.\n"
+                //        << "Congratulations — you've escaped the museum!\n";
 
                 running = false;
             }
             else
             {
-                std::cout << "The front door is locked tight. You still need a key.\n";
+                PrintSlow("The front door is locked tight. You still need a key.\n");
+                //std::cout << "The front door is locked tight. You still need a key.\n";
             }
         }
     }
@@ -519,27 +636,31 @@ struct Game
     // 3. Player must be standing at the correct door
     if (currentRoom != 2)
     {
-        std::cout << "There's nothing here to use the card on.\n";
+        //std::cout << "There's nothing here to use the card on.\n";
+        PrintSlow("There's nothing here to use the card on.\n",40);
         return true; // handled
     }
 
     // 4. Check if the door is already unlocked
     if (securityDoorUnlocked)
     {
-        std::cout << "The door is already unlocked.\n";
+        //std::cout << "The door is already unlocked.\n";
+        PrintSlow("The door is already unlocked.\n",40);
         return true;
     }
 
     // 5. Check if the player actually has the card
     if (!HasItem("security"))
     {
-        std::cout << "You pat your pockets... You don't seem to have a security card.\n";
+        //std::cout << "You pat your pockets... You don't seem to have a security card.\n";
+        PrintSlow("You pat your pockets... You don't seem to have a security card.\n",40);
         return true;
     }
 
     // 6. Unlock the door
     securityDoorUnlocked = true;
-    std::cout << "You swipe the security card. A green light flashes — the lock clicks open.\n";
+    PrintSlow("You swipe the security card. A green light flashes — the lock clicks open.\n",40);
+    //std::cout << "You swipe the security card. A green light flashes — the lock clicks open.\n";
     return true;
 }
 
@@ -555,6 +676,16 @@ struct Game
         std::string verb = tokens[0];
 
         // -----------------------------------------
+        // HELP
+        // -----------------------------------------
+        if (verb == "help")
+        {
+            Help();
+            return;
+        }
+
+
+        // -----------------------------------------
         // LOOK
         // -----------------------------------------
         if (verb == "look")
@@ -565,7 +696,8 @@ struct Game
             }
             else
             {
-                std::cout << "Try: 'look' or 'look around'.\n";
+                PrintSlow("Try to look around.\n");
+                //std::cout << "Try: 'look' or 'look around'.\n";
             }
             return;
         }
@@ -578,7 +710,8 @@ struct Game
             // Need at least a verb + something
             if (tokens.size() < 2)
             {
-                std::cout << "Try to pick up item or use item\n";
+                //std::cout << "Try to pick up item or use item\n";
+                PrintSlow("Try to pick up item or use item\n",40);
                 return;
             }
 
@@ -594,7 +727,8 @@ struct Game
             // If we only got "pick up" with no item
             if (startIndex >= tokens.size())
             {
-                std::cout << "Try to pick up item or use item\n";
+                PrintSlow("Try to pick up item or use item\n",40);
+                //std::cout << "Try to pick up item or use item\n";
                 return;
             }
 
@@ -728,8 +862,10 @@ struct Game
             // From here on we only want plain "use" for other items
             if (verb != "use")
             {
-                std::cout << "You " << verb << " the " << itemWord
-                        << ", but nothing special happens.\n";
+                std::string msg = "You " + verb + " the " + itemWord + ", but nothing special happens.\n";
+                PrintSlow(msg,40);
+                //std::cout << "You " << verb << " the " << itemWord
+                //        << ", but nothing special happens.\n";
                 return;
             }
 
@@ -740,19 +876,22 @@ struct Game
             {
                 if (flashlightState == FlashlightState::NotOwned)
                 {
-                    std::cout << "You don't have a flashlight.\n";
+                    PrintSlow("You don't have a flashlight.\n",40);
+                    //std::cout << "You don't have a flashlight.\n";
                     return;
                 }
 
                 if (flashlightState == FlashlightState::Off)
                 {
                     flashlightState = FlashlightState::On;
-                    std::cout << "You switch on the flashlight. The beam cuts through the darkness.\n";
+                    PrintSlow("You switch on the flashlight. The beam cuts through the darkness.\n",40);
+                    //std::cout << "You switch on the flashlight. The beam cuts through the darkness.\n";
                 }
                 else if (flashlightState == FlashlightState::On)
                 {
                     flashlightState = FlashlightState::Off;
-                    std::cout << "You turn off the flashlight. Darkness closes in.\n";
+                    PrintSlow("You turn off the flashlight. Darkness closes in.\n",40);
+                    //std::cout << "You turn off the flashlight. Darkness closes in.\n";
                 }
                 return;
             }
@@ -766,13 +905,15 @@ struct Game
                 const int dogRoom = 4; // Closed exhibit
                 if (currentRoom != dogRoom)
                 {
-                    std::cout << "There's no dog here.\n";
+                    PrintSlow("There's no dog here.\n",40);
+                    //std::cout << "There's no dog here.\n";
                     return;
                 }
 
                 if (!HasItem("bone"))
                 {
-                    std::cout << "You don't have a bone.\n";
+                    PrintSlow("You don't have a bone.\n",40);
+                    //std::cout << "You don't have a bone.\n";
                     return;
                 }
 
@@ -792,10 +933,12 @@ struct Game
                 // Hostile -- Friendly transition
                 dogState = DogState::Friendly;
                 RemoveItem("bone");
-
-                std::cout << "You offer the fossil bone. The dog sniffs it cautiously,\n"
-                        << "then wags its tail and trots over to you.\n"
-                        << "Something shiny swings from its collar — a key drops to the floor.\n";
+                PrintSlow("You offer the fossil bone. The dog sniffs it cautiously,\n",40);
+                PrintSlow("then wags its tail and trots over to you.\n",40);
+                PrintSlow("Something shiny swings from its collar — a key drops to the floor.\n",40);
+                //std::cout << "You offer the fossil bone. The dog sniffs it cautiously,\n"
+                //        << "then wags its tail and trots over to you.\n"
+                //        << "Something shiny swings from its collar — a key drops to the floor.\n";
 
                 rooms[currentRoom]->items.push_back(
                     {"key", "a small key lying on the ground"});
@@ -803,8 +946,10 @@ struct Game
             }
 
             // Fallback USE response
-            std::cout << "You try to use the " << itemWord
-                    << " on " << target << ", but nothing happens.\n";
+            std::string msg = "You try to use the " + itemWord + " on " + target + ", but nothing happens.\n";
+            PrintSlow(msg,40);
+            //std::cout << "You try to use the " << itemWord
+            //        << " on " << target << ", but nothing happens.\n";
             return;
         }
 
@@ -820,7 +965,8 @@ struct Game
         // -----------------------------------------
         // UNKNOWN COMMAND
         // -----------------------------------------
-        std::cout << "I don't understand that. Try: use <item> on <target>\n";
+        PrintSlow("I don't understand that. Try proper commands(Use,Look,Grab)",40);
+        //std::cout << "I don't understand that. Try proper commands(Use,Look,Grab)";
     }
     void Play()
     {
